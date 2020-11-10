@@ -22,6 +22,8 @@ unordered_set<int> terminal;    //终结符的集合
 map<string,int> table;   //符号表  <符号,编号> 
 map<int,string> id_string_table; //符号翻译表 
 
+unordered_set<int> analyze_table[100][100]; //分析表(至于为什么分析表我又写在全局变量里了，因为方便)  analyze_table[i][j] 表示非终结符i遇到终结符j时的选择 
+
 
 //没什么x用的函数，可以把两行变一行 
 void addProduction(int left,vector<int> right){
@@ -263,7 +265,25 @@ unordered_map<int,unordered_set<int>> getFirstS(unordered_set<int> nullable,unor
 		index++;
 	}
 	return firstS;
-} 
+}
+
+//构建分析表 
+void createAnalyzeTable(unordered_map<int,unordered_set<int>> firstS){
+	for(int i=0;i<100;i++)
+		for(int j=0;j<100;j++)
+			analyze_table[i][j].clear();
+	
+	for(auto x:firstS){
+		int productionIndex = x.first;
+		int NT = productions[productionIndex].left;
+		for(auto a:x.second){
+			int T = a;
+			analyze_table[NT][T].insert(productionIndex);
+		}
+	}
+}
+
+
 
 
 int main(){
@@ -312,5 +332,20 @@ int main(){
 		}
 		cout<<endl;
 	}
+	//测试analyze_table 分析表
+	createAnalyzeTable(firstS);
+	for(int t:terminal) cout<<"       "<<id_string_table[t];
+	cout<<endl; 
+	for(int nt:nonTerminal){
+		cout<<id_string_table[nt]<<"     ";
+		for(int t:terminal){
+			for(int candidate:analyze_table[nt][t]){
+				cout<<candidate<<" ";
+			}
+			cout<<"      ";
+		}
+		cout<<endl;
+	}
+	cout<<endl; 
 	return 0;
 }

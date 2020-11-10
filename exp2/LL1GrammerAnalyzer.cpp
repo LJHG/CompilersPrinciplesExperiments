@@ -5,6 +5,7 @@
 #include<set>
 #include<unordered_set>
 #include<unordered_map>
+#include<stack>
 using namespace std;
 
 struct production{
@@ -42,18 +43,25 @@ bool isNonTerminal(int icon){
  
 void initTable(){
 	//现在根据一个特定的文法来初始化table 和 TNT试试
-	table["X"] = 1; id_string_table[1] = "X";
-	table["Y"] = 2; id_string_table[2] = "Y";
-	table["Z"] = 3; id_string_table[3] = "Z";
-	table["a"] = 4; id_string_table[4] = "a";
-	table["c"] = 5; id_string_table[5] = "c";
-	table["d"] = 6; id_string_table[6] = "d";
+	table["E"] = 1; id_string_table[1] = "E";
+	table["E'"]= 2; id_string_table[2] = "E'";
+	table["T"] = 3; id_string_table[3] = "T";
+	table["T'"] = 4; id_string_table[4] = "T'";
+	table["F"] = 5; id_string_table[5] = "F";
+	table["+"] = 6; id_string_table[6] = "+";
+	table["*"] = 7; id_string_table[7] = "*";
+	table["id"] = 8; id_string_table[8] = "id";
+	table["("] = 9; id_string_table[9] = "(";
+	table[")"] = 10; id_string_table[10] = ")";
+	 
 }
 
 void initTNT(){
-	//初始化nonterminal和terminal 
-	nonTerminal.insert(1);nonTerminal.insert(2);nonTerminal.insert(3);
-	terminal.insert(4);terminal.insert(5);terminal.insert(6);	
+	//初始化nonterminal和terminal
+	vector<int> nt = {1,2,3,4,5};
+	vector<int> t = {6,7,8,9,10};
+	for(int x:nt) nonTerminal.insert(x);
+	for(int x:t) terminal.insert(x);
 }
 
 void initProductions(){
@@ -61,30 +69,37 @@ void initProductions(){
 	vector<int> right;
 	//纯手打文法，没办法啊 
 	///////////////////
-	left = 3;
-	right.clear(); right.push_back(6);
-	addProduction(left,right);
-	///////////////////
-	left = 3;
-	right.clear();right.push_back(1);right.push_back(2);right.push_back(3);
+	left = 1;
+	right.clear(); right.push_back(3);right.push_back(2);
 	addProduction(left,right);
 	///////////////////
 	left = 2;
-	right.clear();right.push_back(5);
+	right.clear(); right.push_back(6);right.push_back(3);right.push_back(2);
 	addProduction(left,right);
 	///////////////////
 	left = 2;
-	right.clear(); //右部为空，什么都不push 
+	right.clear();
 	addProduction(left,right);
 	///////////////////
-	left = 1;
-	right.clear();right.push_back(2);
+	left = 3;
+	right.clear(); right.push_back(5);right.push_back(4);
 	addProduction(left,right);
-	//////////////////
-	left = 1;
-	right.clear();right.push_back(4);
+	///////////////////
+	left = 4;
+	right.clear(); right.push_back(7);right.push_back(5);right.push_back(4);
 	addProduction(left,right);
-	///////////////////////// 
+	///////////////////
+	left = 4;
+	right.clear();
+	addProduction(left,right);
+	///////////////////
+	left = 5;
+	right.clear(); right.push_back(9);right.push_back(1);right.push_back(10);
+	addProduction(left,right);
+	///////////////////
+	left = 5;
+	right.clear(); right.push_back(8);
+	addProduction(left,right);
 } 
 
 void printProductions(){
@@ -283,12 +298,40 @@ void createAnalyzeTable(unordered_map<int,unordered_set<int>> firstS){
 	}
 }
 
+void printAnalyzeTable(){
+	//这个格式化对齐太难了 
+	int initial = 9;
+	int spaceNum;
+	for(int t:terminal){
+		spaceNum = initial-id_string_table[t].size();
+		while(spaceNum--) cout<<" ";
+		cout<<id_string_table[t];
+	}
+	
+	cout<<endl; 
+	// space num ---- initial个数 
+	for(int nt:nonTerminal){
+		cout<<id_string_table[nt];
+		spaceNum = initial - id_string_table[nt].size();
+		while(spaceNum--) cout<<" ";
+		for(int t:terminal){
+			spaceNum = initial;
+			for(int candidate:analyze_table[nt][t]){
+				cout<<candidate<<" ";spaceNum-=2;
+			}
+			while(spaceNum--) cout<<" ";
+		}
+		cout<<endl;
+	}
+	cout<<endl; 
+}
+
 
 
 
 int main(){
 	
-	vector<int> tokens; int tokenPos = 0;
+	
 	//init
 	initTable();
 	initTNT();
@@ -334,18 +377,38 @@ int main(){
 	}
 	//测试analyze_table 分析表
 	createAnalyzeTable(firstS);
-	for(int t:terminal) cout<<"       "<<id_string_table[t];
-	cout<<endl; 
-	for(int nt:nonTerminal){
-		cout<<id_string_table[nt]<<"     ";
-		for(int t:terminal){
-			for(int candidate:analyze_table[nt][t]){
-				cout<<candidate<<" ";
+	printAnalyzeTable();
+	
+	//根据分析表进行语法分析
+	vector<int> tokens={8,6,8,7,8}; int tokenPos = 0; int tokenLen = tokens.size();
+	stack<int> s;
+	s.push(1);
+	while(!s.empty()){
+		int x  = s.top();
+		if(isTerminal(x))
+		{
+			if(x == tokens[tokenPos]){
+			tokenPos++;
+			s.pop();
+			}else{
+				cout<<"发生错误"<<endl;
+				break;
 			}
-			cout<<"      ";
 		}
-		cout<<endl;
+		else{
+			s.pop();
+			unordered_set<int> productionIndexs = analyze_table[x][tokens[tokenPos]]; //查表
+			//虽然是Indexs，但是讲道理，只有一个才是正常的,我这里就当一个算了
+			vector<int> right;
+			for(int productionIndex:productionIndexs){
+				right = productions[productionIndex].right;
+			} 
+			
+			for(int i=right.size()-1;i>=0;i--)
+				s.push(right[i]);
+		}
 	}
-	cout<<endl; 
+	cout<<"语法分析完成无误"<<endl;
+	 
 	return 0;
 }

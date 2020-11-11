@@ -6,6 +6,7 @@
 #include<unordered_set>
 #include<unordered_map>
 #include<stack>
+#include <fstream>
 using namespace std;
 
 struct production{
@@ -14,7 +15,7 @@ struct production{
 	production(int left,vector<int> right){
 		this->left = left;
 		this->right = right;
-	} 
+	}
 };
 
 vector<production> productions; //文法 
@@ -23,7 +24,7 @@ unordered_set<int> terminal;    //终结符的集合
 map<string,int> table;   //符号表  <符号,编号> 
 map<int,string> id_string_table; //符号翻译表 
 
-unordered_set<int> analyze_table[100][100]; //分析表(至于为什么分析表我又写在全局变量里了，因为方便)  analyze_table[i][j] 表示非终结符i遇到终结符j时的选择 
+unordered_set<int> analyze_table[200][200]; //分析表(至于为什么分析表我又写在全局变量里了，因为方便)  analyze_table[i][j] 表示非终结符i遇到终结符j时的选择 
 
 
 //没什么x用的函数，可以把两行变一行 
@@ -42,72 +43,168 @@ bool isNonTerminal(int icon){
 }
  
 void initTable(){
-	//现在根据一个特定的文法来初始化table 和 TNT试试
-	table["E"] = 1; id_string_table[1] = "E";
-	table["E'"]= 2; id_string_table[2] = "E'";
-	table["T"] = 3; id_string_table[3] = "T";
-	table["T'"] = 4; id_string_table[4] = "T'";
-	table["F"] = 5; id_string_table[5] = "F";
-	table["+"] = 6; id_string_table[6] = "+";
-	table["*"] = 7; id_string_table[7] = "*";
-	table["id"] = 8; id_string_table[8] = "id";
-	table["("] = 9; id_string_table[9] = "(";
-	table[")"] = 10; id_string_table[10] = ")";
-	table["$"] = 11; id_string_table[11] = "$"; //终止符，我感觉还是要加进来，不然很奇怪 
-	 
+	//先把之前词法分析的终结符抄过来
+	table["int"] = 1; id_string_table[1] = "int";
+	table["if"] = 2; id_string_table[2] = "if";
+	table["else"] = 3; id_string_table[3] = "else";
+	table["get"] = 4; id_string_table[4] = "get";
+	table["put"] = 5; id_string_table[5] = "put";
+	table["("] = 6; id_string_table[6] = "(";
+	table[")"] = 7; id_string_table[7] = ")";
+	table[">"] = 8; id_string_table[8] = ">";
+	table["<"] = 9; id_string_table[9] = "<";
+	table["="] = 10; id_string_table[10] = "=";
+	table[">="] = 11; id_string_table[11] = ">=";
+	table["<="] = 12; id_string_table[12] = "<=";
+	table["=="] = 13; id_string_table[13] = "==";
+	table["!"] = 14; id_string_table[14] = "!";
+	table["!="] = 15; id_string_table[15] = "!=";
+	table["&&"] = 16; id_string_table[16] = "&&";
+	table["||"] = 17; id_string_table[17] = "||";
+	table["while"] = 18; id_string_table[18] = "while";
+	table[";"] = 19; id_string_table[19] = ";";
+	table[","] = 20; id_string_table[20] = ",";
+	table["+"] = 21; id_string_table[21] = "+";
+	table["-"] = 22; id_string_table[22] = "-";
+	table["{"] = 23; id_string_table[23] = "{";
+	table["}"] = 24; id_string_table[24] = "}";
+	table["|"] = 25; id_string_table[25] = "|";
+	table["常量"] = 66; id_string_table[66] = "常量";
+	table["变量"] = 77; id_string_table[77] = "变量";
+	
+	table["$"] = 200; id_string_table[200] = "$";
+	
+	//非终结符我就定义在100开外好了
+	table["程序"] = 100; id_string_table[100] = "程序";
+	table["句子"] = 101; id_string_table[101] = "句子";
+	table["定义赋值语句"] = 102; id_string_table[102] = "定义赋值语句";
+	table["定义语句"] = 103; id_string_table[103] = "定义语句";
+	table["赋值语句"] = 104; id_string_table[104] = "赋值语句";
+	table["加变量"] = 105; id_string_table[105] = "加变量";
+	table["表达式"] = 106; id_string_table[106] = "表达式";
+	table["一元表达式"] = 107; id_string_table[107] = "一元表达式";
+	table["二元表达式"] = 108; id_string_table[108] = "二元表达式";
+	table["二元运算符"] = 109; id_string_table[109] = "二元运算符";
 }
 
 void initTNT(){
 	//初始化nonterminal和terminal
-	vector<int> nt = {1,2,3,4,5};
-	vector<int> t = {6,7,8,9,10,11};
+	vector<int> t = {200,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,66,77};
+	vector<int> nt = {100,101,102,103,104,105,106,107,108};
 	for(int x:nt) nonTerminal.insert(x);
 	for(int x:t) terminal.insert(x);
 }
 
 void initProductions(){
+	//放弃自动处理了 
 	int left;
 	vector<int> right;
-	//纯手打文法，没办法啊 
+	//纯手打文法
 	///////////////////
-	left = 1;
-	right.clear(); right.push_back(3);right.push_back(2);
+	left = 100;
+	right.clear(); right.push_back(101);right.push_back(100);
 	addProduction(left,right);
 	///////////////////
-	left = 2;
-	right.clear(); right.push_back(6);right.push_back(3);right.push_back(2);
+	left = 101;
+	right.clear(); right.push_back(102);
 	addProduction(left,right);
 	///////////////////
-	left = 2;
+	left = 101;
+	right.clear(); right.push_back(103);
+	addProduction(left,right);
+	///////////////////
+	left = 101;
+	right.clear(); right.push_back(104);
+	addProduction(left,right);
+	///////////////////
+	left = 105;
+	right.clear(); right.push_back(20);right.push_back(77);
+	addProduction(left,right);
+	///////////////////
+	left = 105;
 	right.clear();
 	addProduction(left,right);
 	///////////////////
-	left = 3;
-	right.clear(); right.push_back(5);right.push_back(4);
+	left = 102;
+	right.clear(); right.push_back(1);right.push_back(77);right.push_back(105);right.push_back(10);right.push_back(106);right.push_back(19);
 	addProduction(left,right);
 	///////////////////
-	left = 4;
-	right.clear(); right.push_back(7);right.push_back(5);right.push_back(4);
+	left = 103;
+	right.clear(); right.push_back(1);right.push_back(77);right.push_back(105);right.push_back(19);
 	addProduction(left,right);
 	///////////////////
-	left = 4;
-	right.clear();
+	left = 104;
+	right.clear(); right.push_back(77);right.push_back(10);right.push_back(106);right.push_back(19);
 	addProduction(left,right);
 	///////////////////
-	left = 5;
-	right.clear(); right.push_back(9);right.push_back(1);right.push_back(10);
+	left = 106;
+	right.clear(); right.push_back(66);
 	addProduction(left,right);
 	///////////////////
-	left = 5;
+	left = 106;
+	right.clear(); right.push_back(107);
+	addProduction(left,right);
+	///////////////////
+	left = 106;
+	right.clear(); right.push_back(108);
+	addProduction(left,right);
+	///////////////////
+	left = 107;
+	right.clear(); right.push_back(6);right.push_back(14);right.push_back(77);right.push_back(7);
+	addProduction(left,right);
+	///////////////////
+	left = 108;
+	right.clear(); right.push_back(6);right.push_back(77);right.push_back(109);right.push_back(77);right.push_back(7);
+	addProduction(left,right);
+	///////////////////
+	left = 109;
+	right.clear(); right.push_back(21);
+	addProduction(left,right);
+	///////////////////
+	left = 109;
+	right.clear(); right.push_back(22);
+	addProduction(left,right);
+	///////////////////
+	left = 109;
+	right.clear(); right.push_back(13);
+	addProduction(left,right);
+	///////////////////
+	left = 109;
 	right.clear(); right.push_back(8);
 	addProduction(left,right);
+	///////////////////
+	left = 109;
+	right.clear(); right.push_back(9);
+	addProduction(left,right);
+	///////////////////
+	left = 109;
+	right.clear(); right.push_back(15);
+	addProduction(left,right);
+	///////////////////
+	left = 109;
+	right.clear(); right.push_back(11);
+	addProduction(left,right);
+	///////////////////
+	left = 109;
+	right.clear(); right.push_back(12);
+	addProduction(left,right);
+	///////////////////
+	left = 109;
+	right.clear(); right.push_back(16);
+	addProduction(left,right);
+	///////////////////
+	left = 109;
+	right.clear(); right.push_back(17);
+	addProduction(left,right);
+	
+	
 } 
 
 
 void printProduction(int productionIndex){
 	cout<<id_string_table[productions[productionIndex].left]<<" -> ";
 	for(auto x:productions[productionIndex].right){
-		cout<<id_string_table[x]; 
+		cout<<id_string_table[x]<<" "; 
 	}
 	cout<<endl; 
 } 
@@ -120,7 +217,7 @@ void printProductions(){
 		cout<<production.left<<" -> ";
 		for(auto icon:production.right)
 		{
-			cout<<icon;
+			cout<<icon<<" ";
 		}
 		cout<<endl;
 	}
@@ -130,7 +227,7 @@ void printProductions(){
 		cout<<id_string_table[production.left]<<" -> ";
 		for(auto icon:production.right)
 		{
-			cout<<id_string_table[icon];
+			cout<<id_string_table[icon]<<" ";
 		}
 		cout<<endl;
 	}
@@ -214,7 +311,7 @@ unordered_map<int,unordered_set<int> > getFirst(unordered_set<int> nullable){
 //获得非终结符的Follow集 
 unordered_map<int,unordered_set<int> > getFollow(unordered_set<int> nullable,unordered_map<int,unordered_set<int>> first){
 	unordered_map<int,unordered_set<int> > follow;
-	follow[1].insert(11);
+	follow[100].insert(200);  //起始符的follow集初始化为终止符 
 	while(1){
 		//先计算follow集的大小
 		int size1 = 0;
@@ -300,8 +397,8 @@ unordered_map<int,unordered_set<int>> getFirstS(unordered_set<int> nullable,unor
 
 //构建分析表 
 void createAnalyzeTable(unordered_map<int,unordered_set<int>> firstS){
-	for(int i=0;i<100;i++)
-		for(int j=0;j<100;j++)
+	for(int i=0;i<200;i++)
+		for(int j=0;j<200;j++)
 			analyze_table[i][j].clear();
 	
 	for(auto x:firstS){
@@ -316,7 +413,7 @@ void createAnalyzeTable(unordered_map<int,unordered_set<int>> firstS){
 
 void printAnalyzeTable(){
 	//这个格式化对齐太难了 
-	int initial = 9;
+	int initial = 20;
 	int spaceNum;
 	for(int t:terminal){
 		spaceNum = initial-id_string_table[t].size();
@@ -360,6 +457,7 @@ int main(){
 	initProductions();
 	//
 	printProductions();
+	
 	//测试Nullable集合
 	cout<<"nullable集合如下所示:"<<endl;
 	unordered_set<int> nullable =getNullable();
@@ -367,6 +465,7 @@ int main(){
 		cout<<id_string_table[x]<<" ";
 	}
 	cout<<endl;
+	
 	//测试first集合
 	cout<<"first集合如下所示："<<endl;
 	unordered_map<int,unordered_set<int>> first = getFirst(nullable);
@@ -377,6 +476,7 @@ int main(){
 		}
 		cout<<endl;
 	}
+
 	//测试follow集合 
 	cout<<"follow集合如下所示："<<endl;
 	unordered_map<int,unordered_set<int>> follow = getFollow(nullable,first);
@@ -387,6 +487,7 @@ int main(){
 		}
 		cout<<endl;
 	}
+
 	//测试first_S集合
 	cout<<"first_S集合如下所示："<<endl;
 	unordered_map<int,unordered_set<int>> firstS = getFirstS(nullable,first,follow);
@@ -397,15 +498,21 @@ int main(){
 		}
 		cout<<endl;
 	}
+	
 	//测试analyze_table 分析表
 	createAnalyzeTable(firstS);
 	printAnalyzeTable();
-	
+//	cout<<"************"<<endl;
+//	for(auto productionNum:analyze_table[101][1]){
+//		cout<<productionNum<<" ";
+//	}
+//	
+	return 0;
 	//根据分析表进行语法分析
-	vector<int> tokens={6,11}; int tokenPos = 0; int tokenLen = tokens.size(); //{8,6,8,7,8}
+	vector<int> tokens={1,77,10,66,19,200}; int tokenPos = 0; int tokenLen = tokens.size(); //{8,6,8,7,8}
 	stack<int> s;
-	s.push(11);//push结束符 
-	s.push(1); //push开始符号 
+	s.push(200);//push结束符 
+	s.push(100); //push开始符号 
 	int error = 0; 
 	while(!s.empty()){
 		//打印当前栈内元素 
@@ -444,7 +551,8 @@ int main(){
 			if(productionIndexs.size() != 1){
 				error = 1;
 				cout<<endl;
-				cout<<"!!!!发生了语法错误!!!!"<<endl;
+				if(productionIndexs.size() ==0 )cout<<"!!!!发生了语法错误,分析表对应为空!!!!"<<endl;
+				if(productionIndexs.size() >1 )cout<<"!!!!发生了语法错误,分析表对应选择大于1!!!!"<<endl;	
 				break;
 			}
 			vector<int> right;

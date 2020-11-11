@@ -86,12 +86,13 @@ void initTable(){
 	table["一元表达式中间部分"] = 108; id_string_table[108] = "一元表达式中间部分";
 	table["二元表达式中间部分"] = 109; id_string_table[109] = "二元表达式中间部分";
 	table["二元运算符"] = 110; id_string_table[110] = "二元运算符";
+	table["数"] = 111; id_string_table[111] = "数"; 
 }
 
 void initTNT(){
 	//初始化nonterminal和terminal
 	vector<int> t = {200,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,66,77};
-	vector<int> nt = {100,101,102,103,104,105,106,107,108};
+	vector<int> nt = {100,101,102,103,104,105,106,107,108,109,110,111};
 	for(int x:nt) nonTerminal.insert(x);
 	for(int x:t) terminal.insert(x);
 }
@@ -159,11 +160,11 @@ void initProductions(){
 	addProduction(left,right);
 	///////////////////
 	left = 108;
-	right.clear();right.push_back(14);right.push_back(77);
+	right.clear();right.push_back(14);right.push_back(111);
 	addProduction(left,right);
 	///////////////////
 	left = 109;
-	right.clear();right.push_back(77);right.push_back(110);right.push_back(77);
+	right.clear();right.push_back(111);right.push_back(110);right.push_back(111);
 	addProduction(left,right);
 	///////////////////
 	left = 110;
@@ -205,7 +206,14 @@ void initProductions(){
 	left = 110;
 	right.clear(); right.push_back(17);
 	addProduction(left,right);
-	
+	///////////////////
+	left = 111;
+	right.clear(); right.push_back(66);
+	addProduction(left,right);
+	///////////////////
+	left = 111;
+	right.clear(); right.push_back(77);
+	addProduction(left,right);
 	
 } 
 
@@ -541,7 +549,7 @@ int main(){
 
 	//return 0;
 	//根据分析表进行语法分析
-	vector<int> tokens={1,77,20,77,10,6,77,13,77,7,19,200}; int tokenPos = 0; int tokenLen = tokens.size(); //{8,6,8,7,8}
+	vector<int> tokens={1,77,20,77,10,6,77,13,66,7,19,200}; int tokenPos = 0; int tokenLen = tokens.size(); //{8,6,8,7,8}
 	stack<int> s;
 	s.push(200);//push结束符 
 	s.push(100); //push开始符号 

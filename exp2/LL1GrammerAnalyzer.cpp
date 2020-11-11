@@ -77,14 +77,15 @@ void initTable(){
 	//非终结符我就定义在100开外好了
 	table["程序"] = 100; id_string_table[100] = "程序";
 	table["句子"] = 101; id_string_table[101] = "句子";
-	table["定义赋值语句"] = 102; id_string_table[102] = "定义赋值语句";
-	table["定义语句"] = 103; id_string_table[103] = "定义语句";
+	table["定义左公因式"] = 102; id_string_table[102] = "定义左公因式";
+	table["定义可赋值"] = 103; id_string_table[103] = "定义可赋值";
 	table["赋值语句"] = 104; id_string_table[104] = "赋值语句";
 	table["加变量"] = 105; id_string_table[105] = "加变量";
 	table["表达式"] = 106; id_string_table[106] = "表达式";
-	table["一元表达式"] = 107; id_string_table[107] = "一元表达式";
-	table["二元表达式"] = 108; id_string_table[108] = "二元表达式";
-	table["二元运算符"] = 109; id_string_table[109] = "二元运算符";
+	table["表达式中间部分"] = 107; id_string_table[107] = "表达式中间部分";
+	table["一元表达式中间部分"] = 108; id_string_table[108] = "一元表达式中间部分";
+	table["二元表达式中间部分"] = 109; id_string_table[109] = "二元表达式中间部分";
+	table["二元运算符"] = 110; id_string_table[110] = "二元运算符";
 }
 
 void initTNT(){
@@ -105,16 +106,28 @@ void initProductions(){
 	right.clear(); right.push_back(101);right.push_back(100);
 	addProduction(left,right);
 	///////////////////
-	left = 101;
-	right.clear(); right.push_back(102);
+	left = 100;
+	right.clear();
 	addProduction(left,right);
 	///////////////////
 	left = 101;
-	right.clear(); right.push_back(103);
+	right.clear(); right.push_back(102);right.push_back(103); right.push_back(19);
 	addProduction(left,right);
 	///////////////////
 	left = 101;
 	right.clear(); right.push_back(104);
+	addProduction(left,right);
+	///////////////////
+	left = 102;
+	right.clear(); right.push_back(1);right.push_back(77);right.push_back(105);
+	addProduction(left,right);
+	///////////////////
+	left = 103;
+	right.clear(); right.push_back(10);right.push_back(106);
+	addProduction(left,right);
+	///////////////////
+	left = 103;
+	right.clear();
 	addProduction(left,right);
 	///////////////////
 	left = 105;
@@ -123,14 +136,6 @@ void initProductions(){
 	///////////////////
 	left = 105;
 	right.clear();
-	addProduction(left,right);
-	///////////////////
-	left = 102;
-	right.clear(); right.push_back(1);right.push_back(77);right.push_back(105);right.push_back(10);right.push_back(106);right.push_back(19);
-	addProduction(left,right);
-	///////////////////
-	left = 103;
-	right.clear(); right.push_back(1);right.push_back(77);right.push_back(105);right.push_back(19);
 	addProduction(left,right);
 	///////////////////
 	left = 104;
@@ -142,58 +147,62 @@ void initProductions(){
 	addProduction(left,right);
 	///////////////////
 	left = 106;
-	right.clear(); right.push_back(107);
+	right.clear(); right.push_back(6);right.push_back(107);right.push_back(7); 
 	addProduction(left,right);
 	///////////////////
-	left = 106;
+	left = 107;
 	right.clear(); right.push_back(108);
 	addProduction(left,right);
 	///////////////////
 	left = 107;
-	right.clear(); right.push_back(6);right.push_back(14);right.push_back(77);right.push_back(7);
+	right.clear(); right.push_back(109);
 	addProduction(left,right);
 	///////////////////
 	left = 108;
-	right.clear(); right.push_back(6);right.push_back(77);right.push_back(109);right.push_back(77);right.push_back(7);
+	right.clear();right.push_back(14);right.push_back(77);
 	addProduction(left,right);
 	///////////////////
 	left = 109;
+	right.clear();right.push_back(77);right.push_back(110);right.push_back(77);
+	addProduction(left,right);
+	///////////////////
+	left = 110;
 	right.clear(); right.push_back(21);
 	addProduction(left,right);
 	///////////////////
-	left = 109;
+	left = 110;
 	right.clear(); right.push_back(22);
 	addProduction(left,right);
 	///////////////////
-	left = 109;
+	left = 110;
 	right.clear(); right.push_back(13);
 	addProduction(left,right);
 	///////////////////
-	left = 109;
+	left = 110;
 	right.clear(); right.push_back(8);
 	addProduction(left,right);
 	///////////////////
-	left = 109;
+	left = 110;
 	right.clear(); right.push_back(9);
 	addProduction(left,right);
 	///////////////////
-	left = 109;
+	left = 110;
 	right.clear(); right.push_back(15);
 	addProduction(left,right);
 	///////////////////
-	left = 109;
+	left = 110;
 	right.clear(); right.push_back(11);
 	addProduction(left,right);
 	///////////////////
-	left = 109;
+	left = 110;
 	right.clear(); right.push_back(12);
 	addProduction(left,right);
 	///////////////////
-	left = 109;
+	left = 110;
 	right.clear(); right.push_back(16);
 	addProduction(left,right);
 	///////////////////
-	left = 109;
+	left = 110;
 	right.clear(); right.push_back(17);
 	addProduction(left,right);
 	
@@ -233,6 +242,7 @@ void printProductions(){
 	}
 	cout<<endl;
 }
+
 
 //获得所有的NULLABLE的非终结符 
 unordered_set<int> getNullable(){
@@ -439,6 +449,26 @@ void printAnalyzeTable(){
 	cout<<endl; 
 }
 
+bool checkAnalyzeTable(){
+	//检查table里面有没有冲突的情况
+	for(int nt:nonTerminal){
+		for(int t:terminal){
+			if(analyze_table[nt][t].size() > 1)
+			{
+				cout<<"当非终结符"<<" "<<id_string_table[nt];
+				cout<<" 遇上"<<"终结符 "<<id_string_table[t]<<" 时";
+				cout<<"，产生式有以下几个选择："<<endl;
+				for(int productionIndex:analyze_table[nt][t]){
+					printProduction(productionIndex);
+				}
+				return false; 
+			}
+		}
+	}
+	cout<<"分析表没问题"<<endl;
+	return true;
+}
+
 
 
 void printStack(stack<int> s){
@@ -464,7 +494,7 @@ int main(){
 	for(auto x:nullable){
 		cout<<id_string_table[x]<<" ";
 	}
-	cout<<endl;
+	cout<<endl<<endl;
 	
 	//测试first集合
 	cout<<"first集合如下所示："<<endl;
@@ -476,6 +506,7 @@ int main(){
 		}
 		cout<<endl;
 	}
+	cout<<endl;
 
 	//测试follow集合 
 	cout<<"follow集合如下所示："<<endl;
@@ -487,6 +518,7 @@ int main(){
 		}
 		cout<<endl;
 	}
+	cout<<endl;
 
 	//测试first_S集合
 	cout<<"first_S集合如下所示："<<endl;
@@ -498,18 +530,18 @@ int main(){
 		}
 		cout<<endl;
 	}
+	cout<<endl; 
 	
 	//测试analyze_table 分析表
 	createAnalyzeTable(firstS);
-	printAnalyzeTable();
-//	cout<<"************"<<endl;
-//	for(auto productionNum:analyze_table[101][1]){
-//		cout<<productionNum<<" ";
-//	}
-//	
-	return 0;
+	bool ATOK = checkAnalyzeTable(); //analyze_table is OK 
+	//printAnalyzeTable();
+	if(!ATOK) return 0; 
+	cout<<endl;
+
+	//return 0;
 	//根据分析表进行语法分析
-	vector<int> tokens={1,77,10,66,19,200}; int tokenPos = 0; int tokenLen = tokens.size(); //{8,6,8,7,8}
+	vector<int> tokens={1,77,20,77,10,6,77,13,77,7,19,200}; int tokenPos = 0; int tokenLen = tokens.size(); //{8,6,8,7,8}
 	stack<int> s;
 	s.push(200);//push结束符 
 	s.push(100); //push开始符号 
@@ -562,9 +594,7 @@ int main(){
 				right = productions[productionIndex].right;
 			}
 			cout<<"   应用文法：";
-			cout<<id_string_table[productions[index].left]<<" -> ";
-			for(auto x:productions[index].right) cout<<id_string_table[x];
-			cout<<endl; 
+			printProduction(index);
 			
 			for(int i=right.size()-1;i>=0;i--)
 				s.push(right[i]);

@@ -53,13 +53,14 @@ void initTable(){
 	table["id"] = 8; id_string_table[8] = "id";
 	table["("] = 9; id_string_table[9] = "(";
 	table[")"] = 10; id_string_table[10] = ")";
+	table["$"] = 11; id_string_table[11] = "$"; //终止符，我感觉还是要加进来，不然很奇怪 
 	 
 }
 
 void initTNT(){
 	//初始化nonterminal和terminal
 	vector<int> nt = {1,2,3,4,5};
-	vector<int> t = {6,7,8,9,10};
+	vector<int> t = {6,7,8,9,10,11};
 	for(int x:nt) nonTerminal.insert(x);
 	for(int x:t) terminal.insert(x);
 }
@@ -100,6 +101,15 @@ void initProductions(){
 	left = 5;
 	right.clear(); right.push_back(8);
 	addProduction(left,right);
+} 
+
+
+void printProduction(int productionIndex){
+	cout<<id_string_table[productions[productionIndex].left]<<" -> ";
+	for(auto x:productions[productionIndex].right){
+		cout<<id_string_table[x]; 
+	}
+	cout<<endl; 
 } 
 
 void printProductions(){
@@ -201,7 +211,8 @@ unordered_map<int,unordered_set<int> > getFirst(unordered_set<int> nullable){
 
 //获得非终结符的Follow集 
 unordered_map<int,unordered_set<int> > getFollow(unordered_set<int> nullable,unordered_map<int,unordered_set<int>> first){
-	unordered_map<int,unordered_set<int> > follow;	
+	unordered_map<int,unordered_set<int> > follow;
+	follow[1].insert(11);
 	while(1){
 		//先计算follow集的大小
 		int size1 = 0;
@@ -221,7 +232,10 @@ unordered_map<int,unordered_set<int> > getFollow(unordered_set<int> nullable,uno
 					temp.insert(icon);
 				}
 				else{
-					follow[icon] = temp;
+					//follow[icon] 并= temp  哇，这里之前写错了，找了半天的错
+					for(auto x:temp){
+						follow[icon].insert(x);
+					}
 					if(nullable.count(icon) == 0) //icon不是nullable
 					{
 						temp = first[icon]; 
@@ -328,6 +342,12 @@ void printAnalyzeTable(){
 
 
 
+void printStack(stack<int> s){
+	
+}
+
+
+
 
 int main(){
 	
@@ -380,10 +400,26 @@ int main(){
 	printAnalyzeTable();
 	
 	//根据分析表进行语法分析
-	vector<int> tokens={8,6,8,7,8}; int tokenPos = 0; int tokenLen = tokens.size();
+	vector<int> tokens={8,6,8,7,8,11}; int tokenPos = 0; int tokenLen = tokens.size(); //{8,6,8,7,8}
 	stack<int> s;
-	s.push(1);
+	s.push(11);//push结束符 
+	s.push(1); //push开始符号 
 	while(!s.empty()){
+		//打印当前栈内元素 
+		stack<int> temp = s;
+		cout<<"栈内元素: ";
+		while(!temp.empty()){
+			cout<<id_string_table[temp.top()]<<" ";
+			temp.pop();
+		}
+		cout<<"栈底";
+		cout<<"    ";
+		//打印当前正在处理的token
+		cout<<"输入: ";
+		for(int i=tokenPos;i<tokenLen;i++){
+			cout<<id_string_table[tokens[i]];
+		} 
+		 
 		int x  = s.top();
 		if(isTerminal(x))
 		{
@@ -394,15 +430,22 @@ int main(){
 				cout<<"发生错误"<<endl;
 				break;
 			}
+			cout<<endl;
 		}
 		else{
 			s.pop();
 			unordered_set<int> productionIndexs = analyze_table[x][tokens[tokenPos]]; //查表
 			//虽然是Indexs，但是讲道理，只有一个才是正常的,我这里就当一个算了
 			vector<int> right;
+			int index = -1;
 			for(int productionIndex:productionIndexs){
+				index = productionIndex;
 				right = productions[productionIndex].right;
-			} 
+			}
+			cout<<"   应用文法：";
+			cout<<id_string_table[productions[index].left]<<" -> ";
+			for(auto x:productions[index].right) cout<<id_string_table[x];
+			cout<<endl; 
 			
 			for(int i=right.size()-1;i>=0;i--)
 				s.push(right[i]);

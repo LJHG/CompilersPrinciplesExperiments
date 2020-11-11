@@ -114,6 +114,8 @@ void printProduction(int productionIndex){
 
 void printProductions(){
 	//用编号打印一遍 
+	cout<<"文法如下所示："<<endl; 
+	cout<<"*********************"<<endl;
 	for(auto production:productions){
 		cout<<production.left<<" -> ";
 		for(auto icon:production.right)
@@ -400,10 +402,11 @@ int main(){
 	printAnalyzeTable();
 	
 	//根据分析表进行语法分析
-	vector<int> tokens={8,6,8,7,8,11}; int tokenPos = 0; int tokenLen = tokens.size(); //{8,6,8,7,8}
+	vector<int> tokens={6,11}; int tokenPos = 0; int tokenLen = tokens.size(); //{8,6,8,7,8}
 	stack<int> s;
 	s.push(11);//push结束符 
 	s.push(1); //push开始符号 
+	int error = 0; 
 	while(!s.empty()){
 		//打印当前栈内元素 
 		stack<int> temp = s;
@@ -427,15 +430,23 @@ int main(){
 			tokenPos++;
 			s.pop();
 			}else{
-				cout<<"发生错误"<<endl;
+				error = 1;
+				cout<<endl;
+				cout<<"!!!!发生了语法错误!!!!"<<endl;
 				break;
 			}
-			cout<<endl;
+			cout<<endl; 
 		}
 		else{
 			s.pop();
 			unordered_set<int> productionIndexs = analyze_table[x][tokens[tokenPos]]; //查表
 			//虽然是Indexs，但是讲道理，只有一个才是正常的,我这里就当一个算了
+			if(productionIndexs.size() != 1){
+				error = 1;
+				cout<<endl;
+				cout<<"!!!!发生了语法错误!!!!"<<endl;
+				break;
+			}
 			vector<int> right;
 			int index = -1;
 			for(int productionIndex:productionIndexs){
@@ -451,7 +462,7 @@ int main(){
 				s.push(right[i]);
 		}
 	}
-	cout<<"语法分析完成无误"<<endl;
+	if(!error) cout<<"语法分析完成无误"<<endl;
 	 
 	return 0;
 }

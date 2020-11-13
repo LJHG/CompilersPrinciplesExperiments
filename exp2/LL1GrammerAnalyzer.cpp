@@ -89,12 +89,13 @@ void initTable(){
 	table["数"] = 111; id_string_table[111] = "数"; 
 	table["输入语句"] = 112; id_string_table[112] = "输入语句";
 	table["输出语句"] = 113; id_string_table[113] = "输出语句";
+	table["循环语句"] = 114; id_string_table[114] = "循环语句"; 
 }
 
 void initTNT(){
 	//初始化nonterminal和terminal
 	vector<int> t = {200,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,66,77};
-	vector<int> nt = {100,101,102,103,104,105,106,107,108,109,110,111,112,113};
+	vector<int> nt = {100,101,102,103,104,105,106,107,108,109,110,111,112,113,114};
 	for(int x:nt) nonTerminal.insert(x);
 	for(int x:t) terminal.insert(x);
 }
@@ -127,6 +128,10 @@ void initProductions(){
 	///////////////////
 	left = 101;
 	right.clear(); right.push_back(113);
+	addProduction(left,right);
+	///////////////////
+	left = 101;
+	right.clear(); right.push_back(114);
 	addProduction(left,right);
 	///////////////////
 	left = 102;
@@ -231,6 +236,10 @@ void initProductions(){
 	///////////////////
 	left = 113;
 	right.clear(); right.push_back(5);right.push_back(6);right.push_back(77);right.push_back(7);right.push_back(19);
+	addProduction(left,right);
+	///////////////////
+	left = 114;
+	right.clear(); right.push_back(18);right.push_back(106);right.push_back(23);right.push_back(100);right.push_back(24); 
 	addProduction(left,right);
 	
 } 
@@ -567,7 +576,7 @@ int main(){
 
 	//return 0;
 	//根据分析表进行语法分析
-	vector<int> tokens={4,6,77,7,19,200}; int tokenPos = 0; int tokenLen = tokens.size(); //{8,6,8,7,8}
+	vector<int> tokens={18,6,77,13,77,7,23,77,10,66,19,18,6,77,13,77,7,23,77,10,66,19,24,24,200}; int tokenPos = 0; int tokenLen = tokens.size(); //{8,6,8,7,8}
 	stack<int> s;
 	s.push(200);//push结束符 
 	s.push(100); //push开始符号 

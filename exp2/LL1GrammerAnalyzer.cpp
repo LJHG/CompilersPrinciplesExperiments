@@ -24,6 +24,12 @@ struct TreeNode{
 	vector<TreeNode*> sons; 
 };
 
+struct grammerAnalyzeResult{
+	//语法分析返回的结果一个是语法树，一个是错误的位置
+	TreeNode* grammerTree;
+	int tokenWrongIndex; 
+};
+
 vector<production> productions; //文法 
 unordered_set<int> nonTerminal;  //非终结符的集合
 unordered_set<int> terminal;    //终结符的集合
@@ -528,7 +534,11 @@ bool checkAnalyzeTable(){
 	return true;
 }
 
-TreeNode* grammerAnalyze(vector<int> tokens){
+grammerAnalyzeResult grammerAnalyze(vector<int> tokens){
+	
+	grammerAnalyzeResult result;
+	result.tokenWrongIndex = -1;
+	result.grammerTree = nullptr;
 	
 	//init
 	initTable();
@@ -585,7 +595,10 @@ TreeNode* grammerAnalyze(vector<int> tokens){
 	createAnalyzeTable(firstS);
 	bool ATOK = checkAnalyzeTable(); //analyze_table is OK 
 	//printAnalyzeTable();
-	if(!ATOK) return 0; 
+	if(!ATOK) {
+		result.tokenWrongIndex = -2; //表示文法错误，虽然不可能走到这里了
+		return result; 
+	}
 	cout<<endl;
 
 	//根据分析表进行语法分析
@@ -622,6 +635,7 @@ TreeNode* grammerAnalyze(vector<int> tokens){
 			}else{
 				error = 1;
 				cout<<endl;
+				result.tokenWrongIndex = tokenPos;
 				cout<<"!!!!发生了语法错误!!!!"<<endl;
 				break;
 			}
@@ -635,7 +649,8 @@ TreeNode* grammerAnalyze(vector<int> tokens){
 				error = 1;
 				cout<<endl;
 				if(productionIndexs.size() ==0 )cout<<"!!!!发生了语法错误,分析表对应为空!!!!"<<endl;
-				if(productionIndexs.size() >1 )cout<<"!!!!发生了语法错误,分析表对应选择大于1!!!!"<<endl;	
+				if(productionIndexs.size() >1 )cout<<"!!!!发生了语法错误,分析表对应选择大于1!!!!"<<endl;
+				result.tokenWrongIndex = tokenPos;	
 				break;
 			}
 			vector<int> right;
@@ -657,7 +672,8 @@ TreeNode* grammerAnalyze(vector<int> tokens){
 		}
 	}
 	if(!error) cout<<"语法分析完成无误"<<endl;
-	return root;
+	result.grammerTree = root;
+	return result;
 }
 
 
@@ -691,11 +707,18 @@ void printGrammerTree(TreeNode* root){
 
 int main(){
 	vector<int> tokens={2,6,77,13,66,7,23,24,19,200}; 
-	TreeNode* root = grammerAnalyze(tokens);
+	grammerAnalyzeResult result  = grammerAnalyze(tokens);
 	cout<<endl<<endl;
-	 //把语法树打出来看看
-	cout<<"下面是语法树输出结果: "<<endl;
-	printGrammerTree(root);
+	
+	if(result.tokenWrongIndex != -1){
+		cout<<"语法分析发生错误,错误位置在 index "<<result.tokenWrongIndex<<endl;
+	}
+	else{
+		//把语法树打出来看看
+		cout<<"下面是语法树输出结果: "<<endl;
+		printGrammerTree(result.grammerTree);
+	}
+	 
 	 
 	return 0;
 }

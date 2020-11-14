@@ -7,6 +7,13 @@
 
 using namespace std;
 
+struct tokenInfo{
+	string s; //token串
+	int num; //token编号
+	int rowNum; //在第几行
+	int colNum; //在第几列 
+}; 
+
 bool isLetter(char c){
 	if(  (('a' <= c) && (c <= 'z')) ||  (('A' <= c) && (c<= 'Z')) ) return true;
 	return false;
@@ -57,15 +64,9 @@ bool isVariables(string s){
 	return true; 
 }
 
-void showAns(vector<pair<string,int>>& v){
-	int cnt =0;
+void showTokens(vector<tokenInfo>& v){
 	for(auto x:v){
-		cout<<"<"<<x.first<<" , "<<x.second<<">"<<" ";
-		if(cnt == 11){
-			cout<<endl;
-			cnt=0;
-		} 
-		cnt++;
+		cout<<"<"<<x.s<<" , "<<x.num<<">"<<" "<<"位置在第"<<x.rowNum<<"行"<<"第"<<x.colNum<<"列"<<endl;
 	}
 	cout<<endl;
 }
@@ -87,9 +88,18 @@ string readFileIntoString(char * filename)
 	return buf.str();
 }
 
-int main()
-{
-	string s = readFileIntoString("test.txt");
+struct lexicalAnalyzeResult{
+	vector<tokenInfo> tokens;  //记号流
+	int lineCnt; //总行数 
+	int charCnt; //总字符数 
+	map<string,int> wordsFreq;  //单词出现频次 
+};
+
+
+lexicalAnalyzeResult lexicalAnalyze(char* fileName){
+	lexicalAnalyzeResult result;
+	
+	string s = readFileIntoString(fileName);
 	s += '\n'; //一个trick 
 	int state = 0;
 	int pos = 0; 
@@ -99,9 +109,10 @@ int main()
 	keywords[">"]=8;keywords["<"]=9;keywords["="]=10;keywords[">="]=11;keywords["<="]=12;keywords["=="]=13;keywords["!"]=14;keywords["!="]=15;
 	keywords["&&"]=16;keywords["||"]=17;keywords["while"]=18;keywords[";"]=19;keywords[","]=20;keywords["+"]=21;keywords["-"]=22;
 	keywords["{"]=23;keywords["}"]=24;keywords["|"]=25;
-	vector<pair<string,int>> ans;
+	vector<tokenInfo> ans;
 	int lineCnt = 1;
 	int charCnt = 0;
+	int curColPos = 0;
 	string curLine ="";
 	int prePos = -1;
 	map<string,int> cnt; 
@@ -111,6 +122,7 @@ int main()
 			curLine += s[pos];
 			prePos = pos;
 			charCnt++;
+			curColPos++;
 		}
 			
 		switch(state){
@@ -290,6 +302,7 @@ int main()
 				curLine = "";
 				prePos--; //不-- curline就没有换行后第一个字符
 				state = 0;
+				curColPos = 0;
 				break;
 			}
 			case 98:{
@@ -301,18 +314,27 @@ int main()
 				//输出态
 				//cout<<curString<<endl;
 				//cout<<curString<<endl;
+				tokenInfo ti;
+				ti.rowNum = lineCnt;
+				ti.colNum = curColPos - curString.size(); //y1s1，我也搞不清楚这个位置了，但是凑出来是对的 
 				if(keywords[curString] == 0 ){
 					if(isNumber(curString)){
-						ans.push_back(make_pair(curString,66)); //如果是一个数字，就存为<数字,66> 
+						ti.s = curString;
+						ti.num = 66;
+						ans.push_back(ti); //如果是一个数字，就存为<数字,66> 
 					}else if(isVariables(curString)){
-						ans.push_back(make_pair(curString,77)); //如果是一个变量，就存为<数字,77> 
+						ti.s = curString;
+						ti.num = 77;
+						ans.push_back(ti); //如果是一个变量，就存为<变量,77> 
 					}
 					else{
 						state = 100;
 						break;
 					}
 				}else{
-					ans.push_back(make_pair(curString,keywords[curString]));
+					ti.s = curString;
+					ti.num = keywords[curString];
+					ans.push_back(ti);
 				}
 				cnt[curString]++;
 				curString = "";
@@ -337,7 +359,7 @@ int main()
 					cout<<" ";
 				}
 				cout<<"^";
-				return 0;
+				return result;
 			}
 			default:{
 				cout<<"走错地方了";
@@ -345,14 +367,28 @@ int main()
 			}
 		}
 	}
+	
+	result.tokens = ans;
+	result.lineCnt = lineCnt;
+	result.charCnt = charCnt;
+	result.wordsFreq = cnt;
+	
+	return result;
+}
+
+
+
+int main()
+{
+	lexicalAnalyzeResult result = lexicalAnalyze("test.txt");
 	cout<<"词法分析结果："<<endl;
-	showAns(ans);
+	showTokens(result.tokens);
 	cout<<"*********************统计信息************************"<<endl; 
-	cout<<"总行数："<<lineCnt<<endl;
-	cout<<"字符总数："<<charCnt<<endl;
+	cout<<"总行数："<<result.lineCnt<<endl;
+	cout<<"字符总数："<<result.charCnt<<endl;
 	cout<<"各单词出现频次如下："<<endl;
 	cout<<"单词"<<"       "<<"出现次数"<<endl; 
-	for(auto x:cnt){
+	for(auto x:result.wordsFreq){
 		cout<<x.first;
 		int l = 14-x.first.size();
 		while(l--){
@@ -360,5 +396,6 @@ int main()
 		}
 		cout<<x.second<<endl;
 	}
+	
 	return 0;	
 } 

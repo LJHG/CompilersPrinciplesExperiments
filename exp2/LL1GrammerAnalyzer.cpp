@@ -7,6 +7,7 @@
 #include<unordered_map>
 #include<stack>
 #include <fstream>
+#include<queue>
 using namespace std;
 
 struct production{
@@ -528,6 +529,7 @@ bool checkAnalyzeTable(){
 }
 
 TreeNode* grammerAnalyze(vector<int> tokens){
+	
 	//init
 	initTable();
 	initTNT();
@@ -586,19 +588,21 @@ TreeNode* grammerAnalyze(vector<int> tokens){
 	if(!ATOK) return 0; 
 	cout<<endl;
 
-	//return 0;
 	//根据分析表进行语法分析
 	int tokenPos = 0; int tokenLen = tokens.size(); //{8,6,8,7,8}
-	stack<int> s;
-	s.push(200);//push结束符 
-	s.push(100); //push开始符号 
+	stack<TreeNode*> s;
+	TreeNode* endMark = new TreeNode; endMark->number = 200; //endMark->sons.clear();
+	TreeNode* root = new TreeNode; root->number=100; //root->sons.clear();
+	s.push(endMark);//push结束符 
+	s.push(root); //push开始符号 
 	int error = 0; 
+
 	while(!s.empty()){
 		//打印当前栈内元素 
-		stack<int> temp = s;
+		stack<TreeNode*> temp = s;
 		cout<<"栈内元素: ";
 		while(!temp.empty()){
-			cout<<id_string_table[temp.top()]<<" ";
+			cout<<id_string_table[temp.top()->number]<<" ";
 			temp.pop();
 		}
 		cout<<"栈底";
@@ -608,8 +612,8 @@ TreeNode* grammerAnalyze(vector<int> tokens){
 		for(int i=tokenPos;i<tokenLen;i++){
 			cout<<id_string_table[tokens[i]];
 		} 
-		 
-		int x  = s.top();
+		TreeNode* curNode = s.top(); 
+		int x  = s.top()->number;
 		if(isTerminal(x))
 		{
 			if(x == tokens[tokenPos]){
@@ -644,16 +648,54 @@ TreeNode* grammerAnalyze(vector<int> tokens){
 			printProduction(index);
 			
 			for(int i=right.size()-1;i>=0;i--)
-				s.push(right[i]);
+			{
+				TreeNode* pushNode = new TreeNode; pushNode->number =right[i]; pushNode->sons.clear();
+				s.push(pushNode);
+				curNode->sons.push_back(pushNode); //这里栈要求倒着push，没办法，只好也倒着存进sons了 
+			}
+				
 		}
 	}
 	if(!error) cout<<"语法分析完成无误"<<endl;
+	return root;
 }
 
- 
+
+void printGrammerTree(TreeNode* root){
+	//注意，这里node里面的sons是倒着存的哈
+	//采用层序遍历打出来看看
+	queue<pair<TreeNode*,int> > q;
+	q.push(make_pair(root,1));
+	int curLevel = 1;
+	while(!q.empty()){
+		pair<TreeNode*,int> frontPair = q.front();
+		q.pop();
+		if(frontPair.second > curLevel){
+			cout<<endl;
+			curLevel++;
+		}
+		TreeNode* frontNode = frontPair.first;
+		if(isTerminal(frontNode->number)){
+			cout<<"处于第"<<curLevel<<"层的  "<<id_string_table[frontNode->number]<<"是终结符"; 
+		}
+		else{
+			cout<<"处于第"<<curLevel<<"层的  "<<id_string_table[frontNode->number]<<"  "<<"-> ";
+			for(int i=frontNode->sons.size()-1; i>=0;i--){
+				cout<<id_string_table[frontNode->sons[i]->number]<<" ";
+				q.push(make_pair(frontNode->sons[i],curLevel+1));
+			}
+		}
+		cout<<endl;
+	}
+}
 
 int main(){
 	vector<int> tokens={2,6,77,13,66,7,23,24,19,200}; 
-	grammerAnalyze(tokens);
+	TreeNode* root = grammerAnalyze(tokens);
+	cout<<endl<<endl;
+	 //把语法树打出来看看
+	cout<<"下面是语法树输出结果: "<<endl;
+	printGrammerTree(root);
+	 
 	return 0;
 }

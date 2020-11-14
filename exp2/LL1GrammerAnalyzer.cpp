@@ -18,6 +18,11 @@ struct production{
 	}
 };
 
+struct TreeNode{
+	int number; // 对应编号
+	vector<TreeNode*> sons; 
+};
+
 vector<production> productions; //文法 
 unordered_set<int> nonTerminal;  //非终结符的集合
 unordered_set<int> terminal;    //终结符的集合
@@ -522,18 +527,7 @@ bool checkAnalyzeTable(){
 	return true;
 }
 
-
-
-void printStack(stack<int> s){
-	
-}
-
-
-
-
-int main(){
-	
-	
+TreeNode* grammerAnalyze(vector<int> tokens){
 	//init
 	initTable();
 	initTNT();
@@ -594,7 +588,7 @@ int main(){
 
 	//return 0;
 	//根据分析表进行语法分析
-	vector<int> tokens={2,6,77,13,66,7,23,77,10,66,19,24,19,3,23,77,10,66,19,18,6,77,13,77,7,23,77,10,66,19,24,19,24,19,200}; int tokenPos = 0; int tokenLen = tokens.size(); //{8,6,8,7,8}
+	int tokenPos = 0; int tokenLen = tokens.size(); //{8,6,8,7,8}
 	stack<int> s;
 	s.push(200);//push结束符 
 	s.push(100); //push开始符号 
@@ -654,6 +648,12 @@ int main(){
 		}
 	}
 	if(!error) cout<<"语法分析完成无误"<<endl;
-	 
+}
+
+ 
+
+int main(){
+	vector<int> tokens={2,6,77,13,66,7,23,24,19,200}; 
+	grammerAnalyze(tokens);
 	return 0;
 }

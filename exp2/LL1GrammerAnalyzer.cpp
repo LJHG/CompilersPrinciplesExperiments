@@ -165,7 +165,7 @@ void initProductions(){
 	addProduction(left,right);
 	///////////////////
 	left = 105;
-	right.clear(); right.push_back(20);right.push_back(77);
+	right.clear(); right.push_back(20);right.push_back(77);right.push_back(105);
 	addProduction(left,right);
 	///////////////////
 	left = 105;
@@ -249,11 +249,11 @@ void initProductions(){
 	addProduction(left,right);
 	///////////////////
 	left = 112;
-	right.clear(); right.push_back(4);right.push_back(6);right.push_back(77);right.push_back(7);right.push_back(19);
+	right.clear(); right.push_back(4);right.push_back(6);right.push_back(77);right.push_back(105);right.push_back(7);right.push_back(19);
 	addProduction(left,right);
 	///////////////////
 	left = 113;
-	right.clear(); right.push_back(5);right.push_back(6);right.push_back(77);right.push_back(7);right.push_back(19);
+	right.clear(); right.push_back(5);right.push_back(6);right.push_back(77);right.push_back(105);right.push_back(7);right.push_back(19);
 	addProduction(left,right);
 	///////////////////
 	left = 114;

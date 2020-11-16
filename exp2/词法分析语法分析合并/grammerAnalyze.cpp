@@ -1110,7 +1110,8 @@ int main(){
 	vector<int> tokenNums;
 	for(auto x:lexicalResult.tokens){
 		tokenNums.push_back(x.num);
-	} 
+	}
+	tokenNums.push_back(200); //push÷’÷π∑˚ 
 	grammerAnalyzeResult grammerResult  = grammerAnalyze(tokenNums);
 	cout<<endl<<endl;
 	

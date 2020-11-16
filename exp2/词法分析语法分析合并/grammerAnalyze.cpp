@@ -473,22 +473,21 @@ void initTable(){
 	table["赋值语句"] = 104; id_string_table[104] = "赋值语句";
 	table["加变量"] = 105; id_string_table[105] = "加变量";
 	table["表达式"] = 106; id_string_table[106] = "表达式";
-	table["表达式中间部分"] = 107; id_string_table[107] = "表达式中间部分";
-	table["一元表达式中间部分"] = 108; id_string_table[108] = "一元表达式中间部分";
-	table["二元表达式中间部分"] = 109; id_string_table[109] = "二元表达式中间部分";
+	table["可选二元运算部分"] = 107; id_string_table[107] = "可选二元运算部分"; 
+	table["一元运算符"] = 109; id_string_table[109] = "一元运算符"; 
 	table["二元运算符"] = 110; id_string_table[110] = "二元运算符";
 	table["数"] = 111; id_string_table[111] = "数"; 
 	table["输入语句"] = 112; id_string_table[112] = "输入语句";
 	table["输出语句"] = 113; id_string_table[113] = "输出语句";
 	table["循环语句"] = 114; id_string_table[114] = "循环语句"; 
 	table["条件语句"] = 115; id_string_table[115] = "条件语句";
-	table["else部分"] = 116; id_string_table[116] = "else部分";
+	table["else部分"] = 116; id_string_table[116] = "else部分"; 
 }
 
 void initTNT(){
 	//初始化nonterminal和terminal
 	vector<int> t = {200,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,66,77};
-	vector<int> nt = {100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116};
+	vector<int> nt = {100,101,102,103,104,105,106,107,109,110,111,112,113,114,115,116};
 	for(int x:nt) nonTerminal.insert(x);
 	for(int x:t) terminal.insert(x);
 }
@@ -556,27 +555,23 @@ void initProductions(){
 	addProduction(left,right);
 	///////////////////
 	left = 106;
-	right.clear(); right.push_back(66);
+	right.clear(); right.push_back(109);right.push_back(111);
 	addProduction(left,right);
 	///////////////////
 	left = 106;
-	right.clear(); right.push_back(6);right.push_back(107);right.push_back(7); 
+	right.clear(); right.push_back(111);right.push_back(107); 
 	addProduction(left,right);
 	///////////////////
 	left = 107;
-	right.clear(); right.push_back(108);
+	right.clear(); right.push_back(110);right.push_back(111); 
 	addProduction(left,right);
 	///////////////////
 	left = 107;
-	right.clear(); right.push_back(109);
-	addProduction(left,right);
-	///////////////////
-	left = 108;
-	right.clear();right.push_back(14);right.push_back(111);
+	right.clear(); 
 	addProduction(left,right);
 	///////////////////
 	left = 109;
-	right.clear();right.push_back(111);right.push_back(110);right.push_back(111);
+	right.clear();right.push_back(14); 
 	addProduction(left,right);
 	///////////////////
 	left = 110;
@@ -636,11 +631,11 @@ void initProductions(){
 	addProduction(left,right);
 	///////////////////
 	left = 114;
-	right.clear(); right.push_back(18);right.push_back(106);right.push_back(23);right.push_back(100);right.push_back(24);right.push_back(19);
+	right.clear(); right.push_back(18);right.push_back(6);right.push_back(106);right.push_back(7);right.push_back(23);right.push_back(100);right.push_back(24);right.push_back(19);
 	addProduction(left,right);
 	///////////////////
 	left = 115;
-	right.clear(); right.push_back(2);right.push_back(106);right.push_back(23);right.push_back(100);right.push_back(24);right.push_back(19);right.push_back(116);
+	right.clear(); right.push_back(2);right.push_back(6);right.push_back(106);right.push_back(7);right.push_back(23);right.push_back(100);right.push_back(24);right.push_back(19);right.push_back(116);
 	addProduction(left,right);
 	///////////////////
 	left = 116;

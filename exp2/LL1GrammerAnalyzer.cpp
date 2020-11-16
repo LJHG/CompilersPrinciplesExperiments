@@ -293,15 +293,15 @@ void printProduction(int productionIndex){
 void printProductions(){
 	//用编号打印一遍 
 	cout<<"文法如下所示："<<endl; 
-	cout<<"*********************"<<endl;
-	for(auto production:productions){
-		cout<<production.left<<" -> ";
-		for(auto icon:production.right)
-		{
-			cout<<icon<<" ";
-		}
-		cout<<endl;
-	}
+//	cout<<"*********************"<<endl;
+//	for(auto production:productions){
+//		cout<<production.left<<" -> ";
+//		for(auto icon:production.right)
+//		{
+//			cout<<icon<<" ";
+//		}
+//		cout<<endl;
+//	}
 	cout<<"*********************"<<endl;
 	//用字符串的形式打印一遍
 	for(auto production:productions){
@@ -537,7 +537,7 @@ bool checkAnalyzeTable(){
 			}
 		}
 	}
-	cout<<"分析表没问题"<<endl;
+	cout<<"分析表没有冲突问题"<<endl;
 	return true;
 }
 
@@ -617,6 +617,8 @@ grammerAnalyzeResult grammerAnalyze(vector<int> tokens){
 	s.push(root); //push开始符号 
 	int error = 0; 
 
+	cout<<"语法分析过程如下所示："<<endl;
+	cout<<"********************************************"<<endl;
 	while(!s.empty()){
 		//打印当前栈内元素 
 		stack<TreeNode*> temp = s;

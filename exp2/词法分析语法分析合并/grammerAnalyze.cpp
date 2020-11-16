@@ -116,7 +116,7 @@ lexicalAnalyzeResult lexicalAnalyze(char* fileName){
 	keywords["int"]=1;keywords["if"]=2;keywords["else"]=3;keywords["get"]=4;keywords["put"]=5;keywords["("]=6;keywords[")"]=7;
 	keywords[">"]=8;keywords["<"]=9;keywords["="]=10;keywords[">="]=11;keywords["<="]=12;keywords["=="]=13;keywords["!"]=14;keywords["!="]=15;
 	keywords["&&"]=16;keywords["||"]=17;keywords["while"]=18;keywords[";"]=19;keywords[","]=20;keywords["+"]=21;keywords["-"]=22;
-	keywords["{"]=23;keywords["}"]=24;keywords["|"]=25;
+	keywords["{"]=23;keywords["}"]=24;keywords["|"]=25;keywords["&"] = 26;
 	vector<tokenInfo> ans;
 	int lineCnt = 1;
 	int charCnt = 0;
@@ -460,6 +460,7 @@ void initTable(){
 	table["{"] = 23; id_string_table[23] = "{";
 	table["}"] = 24; id_string_table[24] = "}";
 	table["|"] = 25; id_string_table[25] = "|";
+	table["&"] = 26; id_string_table[26] = "&";
 	table["常量"] = 66; id_string_table[66] = "常量";
 	table["变量"] = 77; id_string_table[77] = "变量";
 	
@@ -486,7 +487,7 @@ void initTable(){
 
 void initTNT(){
 	//初始化nonterminal和terminal
-	vector<int> t = {200,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,66,77};
+	vector<int> t = {200,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,66,77};
 	vector<int> nt = {100,101,102,103,104,105,106,107,109,110,111,112,113,114,115,116};
 	for(int x:nt) nonTerminal.insert(x);
 	for(int x:t) terminal.insert(x);
@@ -580,6 +581,14 @@ void initProductions(){
 	///////////////////
 	left = 110;
 	right.clear(); right.push_back(22);
+	addProduction(left,right);
+	///////////////////
+	left = 110;
+	right.clear(); right.push_back(25);
+	addProduction(left,right);
+	///////////////////
+	left = 110;
+	right.clear(); right.push_back(26);
 	addProduction(left,right);
 	///////////////////
 	left = 110;

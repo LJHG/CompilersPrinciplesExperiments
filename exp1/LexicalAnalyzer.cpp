@@ -7,6 +7,9 @@
 
 using namespace std;
 
+/*
+***********************词法分析部分****************************** 
+*/ 
 struct tokenInfo{
 	string s; //token串
 	int num; //token编号
@@ -108,7 +111,7 @@ lexicalAnalyzeResult lexicalAnalyze(char* fileName){
 	keywords["int"]=1;keywords["if"]=2;keywords["else"]=3;keywords["get"]=4;keywords["put"]=5;keywords["("]=6;keywords[")"]=7;
 	keywords[">"]=8;keywords["<"]=9;keywords["="]=10;keywords[">="]=11;keywords["<="]=12;keywords["=="]=13;keywords["!"]=14;keywords["!="]=15;
 	keywords["&&"]=16;keywords["||"]=17;keywords["while"]=18;keywords[";"]=19;keywords[","]=20;keywords["+"]=21;keywords["-"]=22;
-	keywords["{"]=23;keywords["}"]=24;keywords["|"]=25;
+	keywords["{"]=23;keywords["}"]=24;keywords["|"]=25;keywords["&"] = 26;
 	vector<tokenInfo> ans;
 	int lineCnt = 1;
 	int charCnt = 0;
@@ -377,25 +380,3 @@ lexicalAnalyzeResult lexicalAnalyze(char* fileName){
 }
 
 
-
-int main()
-{
-	lexicalAnalyzeResult result = lexicalAnalyze("test.txt");
-	cout<<"词法分析结果："<<endl;
-	showTokens(result.tokens);
-	cout<<"*********************统计信息************************"<<endl; 
-	cout<<"总行数："<<result.lineCnt<<endl;
-	cout<<"字符总数："<<result.charCnt<<endl;
-	cout<<"各单词出现频次如下："<<endl;
-	cout<<"单词"<<"       "<<"出现次数"<<endl; 
-	for(auto x:result.wordsFreq){
-		cout<<x.first;
-		int l = 14-x.first.size();
-		while(l--){
-			cout<<" ";
-		}
-		cout<<x.second<<endl;
-	}
-	
-	return 0;	
-} 

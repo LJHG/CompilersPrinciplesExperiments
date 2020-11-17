@@ -38,11 +38,10 @@ unordered_set<int> nonTerminal;  //非终结符的集合
 unordered_set<int> terminal;    //终结符的集合
 map<string,int> table;   //符号表  <符号,编号> 
 map<int,string> id_string_table; //符号翻译表 
-
 unordered_set<int> analyze_table[200][200]; //分析表(至于为什么分析表我又写在全局变量里了，因为方便)  analyze_table[i][j] 表示非终结符i遇到终结符j时的选择 
 
 
-//没什么x用的函数，可以把两行变一行 
+//可以把两行变一行 
 void addProduction(int left,vector<int> right){
 	production p(left,right);
 	productions.push_back(p);
@@ -349,7 +348,7 @@ unordered_set<int> getNullable(){
 
 //获得非终结符的First集 
 unordered_map<int,unordered_set<int> > getFirst(unordered_set<int> nullable){
-	//计算first集需要传入nullable(要不要把nullable搞成全局变量呢？ 还没想好)
+	//计算first集需要传入nullable
 	unordered_map<int,unordered_set<int>> first;
 	while(1){
 		//先计算first集的大小
@@ -609,7 +608,7 @@ grammerAnalyzeResult grammerAnalyze(vector<int> tokens){
 	cout<<endl;
 
 	//根据分析表进行语法分析
-	int tokenPos = 0; int tokenLen = tokens.size(); //{8,6,8,7,8}
+	int tokenPos = 0; int tokenLen = tokens.size();
 	stack<TreeNode*> s;
 	TreeNode* endMark = new TreeNode; endMark->number = 200; //endMark->sons.clear();
 	TreeNode* root = new TreeNode; root->number=100; //root->sons.clear();

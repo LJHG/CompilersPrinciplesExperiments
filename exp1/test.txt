@@ -1,1 +1,2 @@
-int num1 = 1;
+bool num1 = 0;
+bool num2 = 1;

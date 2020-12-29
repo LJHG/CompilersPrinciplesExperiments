@@ -8,7 +8,8 @@ using namespace std;
 enum KINDS {
 	PROGRAM,ASSIGN,PUT,GET,WHILE,IF,VARIABLE,NOT,NUMBER,
 	ADD,SUB,BITAND,BITOR,EQUAL,NEQUAL,GT,LESS,GTOEQUAL,LESSOREQUAL,AND,OR, //二元运算符 
-	INT,VARIABLES,IFPART,ELSEPART,WHILEPART
+	INT,VARIABLES,IFPART,ELSEPART,WHILEPART,
+	BOOL
 	
 };
 
@@ -22,6 +23,7 @@ void init_kinds(){
 	trans_kinds[NEQUAL] = "NEQUAL";trans_kinds[GT] = "GT";trans_kinds[LESS] = "LESS";trans_kinds[GTOEQUAL] = "GTOEQUAL";trans_kinds[LESSOREQUAL] = "LESSOREQUAL";
 	trans_kinds[AND] = "AND";trans_kinds[OR] = "OR";trans_kinds[INT] ="INT";trans_kinds[VARIABLES] ="VARIABLES";
 	trans_kinds[IFPART] ="IFPART";trans_kinds[ELSEPART] ="ELSEPART";trans_kinds[WHILEPART] ="WHILEPART";
+	trans_kinds[BOOL] ="BOOL";
 	
 }
 
@@ -343,7 +345,10 @@ void processSentence(TreeNode* sentence,ASTnode* father){
 		//变量声明语句
 		//<句子> -> <定义左公因式><定义可赋值 ><;>
 		ASTnode* intNode = new ASTnode();
-		intNode->kind = INT;
+		if(sentence->sons[0]->sons[0]->number == 1)
+			intNode->kind = INT;
+		else if(sentence->sons[0]->sons[0]->number == 27)
+			intNode->kind = BOOL;
 		father->sons.push_back(intNode);
 		
 		ASTnode* variables = new ASTnode();

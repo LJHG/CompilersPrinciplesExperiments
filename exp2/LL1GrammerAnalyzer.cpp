@@ -87,6 +87,7 @@ void initTable(){
 	table["}"] = 24; id_string_table[24] = "}";
 	table["|"] = 25; id_string_table[25] = "|";
 	table["&"] = 26; id_string_table[26] = "&";
+	table["bool"] = 27; id_string_table[27] = "bool";
 	table["常量"] = 66; id_string_table[66] = "常量";
 	table["变量"] = 77; id_string_table[77] = "变量";
 	
@@ -113,7 +114,7 @@ void initTable(){
 
 void initTNT(){
 	//初始化nonterminal和terminal
-	vector<int> t = {200,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,66,77};
+	vector<int> t = {200,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,66,77};
 	vector<int> nt = {100,101,102,103,104,105,106,107,109,110,111,112,113,114,115,116};
 	for(int x:nt) nonTerminal.insert(x);
 	for(int x:t) terminal.insert(x);
@@ -159,6 +160,10 @@ void initProductions(){
 	///////////////////
 	left = 102;
 	right.clear(); right.push_back(1);right.push_back(77);right.push_back(105);
+	addProduction(left,right);
+	///////////////////
+	left = 102;
+	right.clear(); right.push_back(27);right.push_back(77);right.push_back(105);
 	addProduction(left,right);
 	///////////////////
 	left = 103;

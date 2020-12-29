@@ -111,7 +111,7 @@ lexicalAnalyzeResult lexicalAnalyze(char* fileName){
 	keywords["int"]=1;keywords["if"]=2;keywords["else"]=3;keywords["get"]=4;keywords["put"]=5;keywords["("]=6;keywords[")"]=7;
 	keywords[">"]=8;keywords["<"]=9;keywords["="]=10;keywords[">="]=11;keywords["<="]=12;keywords["=="]=13;keywords["!"]=14;keywords["!="]=15;
 	keywords["&&"]=16;keywords["||"]=17;keywords["while"]=18;keywords[";"]=19;keywords[","]=20;keywords["+"]=21;keywords["-"]=22;
-	keywords["{"]=23;keywords["}"]=24;keywords["|"]=25;keywords["&"] = 26;
+	keywords["{"]=23;keywords["}"]=24;keywords["|"]=25;keywords["&"] = 26;keywords["bool"]=27;
 	vector<tokenInfo> ans;
 	int lineCnt = 1;
 	int charCnt = 0;

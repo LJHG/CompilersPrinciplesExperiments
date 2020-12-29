@@ -410,6 +410,7 @@ int main()
 		cout<<"语法分析发生错误，错误的token的index为"<<index<<"，对应的字符串为 "<<id_string_table[tokenNums[index]]<<endl;
 		cout<<"位置在第"<<""<<lexicalResult.tokens[index].rowNum<<"行"<<"，第"<<""<<lexicalResult.tokens[index].colNum<<"列"<<endl;
 		markWrongPos("test.txt",lexicalResult.tokens[index].rowNum,lexicalResult.tokens[index].colNum);
+		cout<<grammerResult.errorInfo<<endl;
 	}
 	else{
 		//把语法树打出来看看

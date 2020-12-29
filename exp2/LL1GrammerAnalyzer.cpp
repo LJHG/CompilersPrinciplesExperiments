@@ -33,7 +33,8 @@ struct TreeNode{
 struct grammerAnalyzeResult{
 	//语法分析返回的结果一个是语法树，一个是错误的位置
 	TreeNode* grammerTree;
-	int tokenWrongIndex; 
+	int tokenWrongIndex;
+	string errorInfo;
 };
 
 vector<production> productions; //文法 
@@ -655,6 +656,7 @@ grammerAnalyzeResult grammerAnalyze(vector<int> tokens,vector<string> tokenStrin
 				cout<<endl;
 				result.tokenWrongIndex = tokenPos;
 				cout<<"!!!!发生了语法错误!!!!"<<endl;
+				result.errorInfo = ("可能是缺失了一个"+id_string_table[x]+" ?");
 				break;
 			}
 			cout<<endl; 
@@ -668,7 +670,24 @@ grammerAnalyzeResult grammerAnalyze(vector<int> tokens,vector<string> tokenStrin
 				cout<<endl;
 				if(productionIndexs.size() ==0 )cout<<"!!!!发生了语法错误,分析表对应为空!!!!"<<endl;
 				if(productionIndexs.size() >1 )cout<<"!!!!发生了语法错误,分析表对应选择大于1!!!!"<<endl;
-				result.tokenWrongIndex = tokenPos;	
+				result.tokenWrongIndex = tokenPos;
+				//开始尝试，试对了就给出建议
+				// 1~27 66 77
+				for(int i=1;i<=77;i++){
+					unordered_set<int> pp = analyze_table[x][i];
+					if(pp.size() == 1){
+						if( (i>=8 && i<=13) || (i>=15 && i<=17) || i==21 || i==22 || i==25 || i==26 )
+							result.errorInfo = ("可能是缺失了一个操作数?");
+						else result.errorInfo = ("可能是缺失了一个"+id_string_table[i]+" ?");
+					}
+					if(i == 27){
+						i = 65;
+					}
+					if(i == 66){
+						i= 76;
+					}
+				}
+				 
 				break;
 			}
 			vector<int> right;

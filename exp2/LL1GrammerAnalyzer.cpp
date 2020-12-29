@@ -24,7 +24,10 @@ struct production{
 
 struct TreeNode{
 	int number; // 对应编号
-	vector<TreeNode*> sons; 
+	vector<TreeNode*> sons;
+	//以下为terminal node专属 
+	int tokenIndex; //这个用于给非终结符的node赋，其它的都为-1 
+	string tokenString; //node 对应的变量名/值 
 };
 
 struct grammerAnalyzeResult{
@@ -540,7 +543,7 @@ bool checkAnalyzeTable(){
 	return true;
 }
 
-grammerAnalyzeResult grammerAnalyze(vector<int> tokens){
+grammerAnalyzeResult grammerAnalyze(vector<int> tokens,vector<string> tokenStrings){
 	
 	grammerAnalyzeResult result;
 	result.tokenWrongIndex = -1;
@@ -610,8 +613,8 @@ grammerAnalyzeResult grammerAnalyze(vector<int> tokens){
 	//根据分析表进行语法分析
 	int tokenPos = 0; int tokenLen = tokens.size();
 	stack<TreeNode*> s;
-	TreeNode* endMark = new TreeNode; endMark->number = 200; //endMark->sons.clear();
-	TreeNode* root = new TreeNode; root->number=100; //root->sons.clear();
+	TreeNode* endMark = new TreeNode; endMark->number = 200; endMark->tokenIndex = -1; //endMark->sons.clear();
+	TreeNode* root = new TreeNode; root->number=100; root->tokenIndex = -1; //root->sons.clear();
 	s.push(endMark);//push结束符 
 	s.push(root); //push开始符号 
 	int error = 0; 
@@ -638,6 +641,8 @@ grammerAnalyzeResult grammerAnalyze(vector<int> tokens){
 		if(isTerminal(x))
 		{
 			if(x == tokens[tokenPos]){
+			curNode->tokenIndex = tokenPos;
+			curNode->tokenString = tokenStrings[tokenPos];	
 			tokenPos++;
 			s.pop();
 			}else{
@@ -672,7 +677,7 @@ grammerAnalyzeResult grammerAnalyze(vector<int> tokens){
 			
 			for(int i=right.size()-1;i>=0;i--)
 			{
-				TreeNode* pushNode = new TreeNode; pushNode->number =right[i]; pushNode->sons.clear();
+				TreeNode* pushNode = new TreeNode; pushNode->number =right[i]; pushNode->sons.clear(); pushNode->tokenIndex = -1;
 				s.push(pushNode);
 				curNode->sons.push_back(pushNode); //这里栈要求倒着push，没办法，只好也倒着存进sons了 
 			}
@@ -700,7 +705,7 @@ void printGrammerTree(TreeNode* root){
 		}
 		TreeNode* frontNode = frontPair.first;
 		if(isTerminal(frontNode->number)){
-			cout<<"处于第"<<curLevel<<"层的  "<<id_string_table[frontNode->number]<<"是终结符"; 
+			cout<<"处于第"<<curLevel<<"层的  "<<id_string_table[frontNode->number]<<"是终结符 对应的index为: "<<frontNode->tokenIndex<<" value为: "<<frontNode->tokenString; 
 		}
 		else{
 			cout<<"处于第"<<curLevel<<"层的  "<<id_string_table[frontNode->number]<<"  "<<"-> ";

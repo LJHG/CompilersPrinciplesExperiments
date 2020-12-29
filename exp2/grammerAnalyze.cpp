@@ -22,13 +22,16 @@ int main(){
 //		cout<<x.second<<endl;
 //	}
 	
-	//之前词法分析的tokens包含信息太多，语法分析器只要num序列即可，这里重新搞一搞
+	//之前词法分析的tokens包含信息太多，语法分析器只要num序列即可(并不是，不然信息越传越少了)，这里重新搞一搞
 	vector<int> tokenNums;
+	vector<string> tokenStrings;
 	for(auto x:lexicalResult.tokens){
 		tokenNums.push_back(x.num);
+		tokenStrings.push_back(x.s);
 	}
-	tokenNums.push_back(200); //push终止符 
-	grammerAnalyzeResult grammerResult  = grammerAnalyze(tokenNums);
+	tokenNums.push_back(200); //push终止符
+	tokenStrings.push_back("$");
+	grammerAnalyzeResult grammerResult  = grammerAnalyze(tokenNums,tokenStrings);
 	cout<<endl<<endl;
 	
 	if(grammerResult.tokenWrongIndex != -1){

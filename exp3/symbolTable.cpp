@@ -88,23 +88,19 @@ void deleteVal(string name,int scope){
 	}
 	else{
 		symbolTable[name]->vals.pop();
-	}
-	
+	}	
 }
 
-
-int main(){
-	cout<<"hello"<<endl;
-	cout<<enterTable(1,"a",-1,1).errorInfo<<endl;
-	cout<<enterTable(-1,"a",1,1).errorInfo<<endl;
-	cout<<getVal("a").val<<endl;
-	cout<<enterTable(-1,"a",2,2).errorInfo<<endl;
-	cout<<getVal("a").val<<endl;
-	deleteVal("a",2);
-	cout<<getVal("a").val<<endl;
-	
-	return 0;
+bool hasVariable(string name){
+	if(symbolTable.count(name) == 0) return false;
+	return true;
 }
+
+bool hasNoValue(string name){
+	if(symbolTable[name]->vals.size() == 0) return true;
+	return false;
+}
+
 
 
 

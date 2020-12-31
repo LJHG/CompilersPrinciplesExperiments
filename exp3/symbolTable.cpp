@@ -19,7 +19,7 @@ struct tableInfo{
 
 map<string,tableItem*> symbolTable;
 
-tableInfo enterTable(int type,string name,int val,int scope,int dscope){
+tableInfo enterTable(int type,string name,int val,int scope){
 	tableInfo info;
 	info.hasError = 0;
 	//定义形插表 
@@ -27,10 +27,11 @@ tableInfo enterTable(int type,string name,int val,int scope,int dscope){
 	{
 		if(symbolTable.count(name) == 0){
 			tableItem* item = new tableItem();
-			item->name = name;
+			item->name = name; 
 			item->type = type;
-			item->vals.push(make_pair(val,scope));
-			item->dscope = dscope;
+			if(val != -1) //如果val不为-1，则需要赋值 
+				item->vals.push(make_pair(val,scope));
+			item->dscope = scope;
 			symbolTable[name] = item;
 		}
 		else{
@@ -49,7 +50,7 @@ tableInfo enterTable(int type,string name,int val,int scope,int dscope){
 			info.errorInfo = "非法的布尔变量赋值!";
 		}
 		else{
-			if(symbolTable[name]->vals.top().second == scope){
+			if(symbolTable[name]->vals.size() >0 && symbolTable[name]->vals.top().second == scope){
 				//如果在同一作用域就是重新赋值 
 				symbolTable[name]->vals.pop();
 			}
@@ -93,23 +94,14 @@ void deleteVal(string name,int scope){
 
 
 int main(){
-	cout<<enterTable(1,"a",2,1,1).errorInfo<<endl;
-	tableInfo info = getVal("a");
-	cout<<info.val<<endl;
-	cout<<info.errorInfo<<endl;
-	cout<<enterTable(-1,"a",3,1,-1).errorInfo<<endl;
-	info = getVal("a");
-	cout<<info.val<<endl;
-	cout<<info.errorInfo<<endl;
-	
-	enterTable(-1,"a",4,2,-1);
+	cout<<"hello"<<endl;
+	cout<<enterTable(1,"a",-1,1).errorInfo<<endl;
+	cout<<enterTable(-1,"a",1,1).errorInfo<<endl;
 	cout<<getVal("a").val<<endl;
-	
-	deleteVal("a",1);
+	cout<<enterTable(-1,"a",2,2).errorInfo<<endl;
 	cout<<getVal("a").val<<endl;
-	deleteVal("a",1);
+	deleteVal("a",2);
 	cout<<getVal("a").val<<endl;
-	
 	
 	return 0;
 }

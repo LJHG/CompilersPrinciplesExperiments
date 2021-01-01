@@ -38,6 +38,8 @@ int main()
 	cout<<endl<<"**************下面进行语义分析******************"<<endl; 
 	errorInfo e = SemanticAnalyze(ASTroot);
 	if(e.hasError){
+		cout<<"语义分析发生错误！！！"<<endl;
+		cout<<"位置在第"<<""<<lexicalResult.tokens[e.errorIndex].rowNum<<"行"<<"，第"<<""<<lexicalResult.tokens[e.errorIndex].colNum<<"列"<<endl;
 		markWrongPos("test.txt",lexicalResult.tokens[e.errorIndex].rowNum,lexicalResult.tokens[e.errorIndex].colNum);
 		cout<<e.errorDetail<<endl;
 	}else{

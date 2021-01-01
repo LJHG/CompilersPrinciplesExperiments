@@ -16,6 +16,15 @@ errorInfo analyzeAssign(ASTnode* root, int curScope);
 errorInfo getNodeVal(ASTnode* root); 
 errorInfo analyzeInt(ASTnode* root,int curScope);
 errorInfo analyzeBool(ASTnode* root,int curScope);
+errorInfo analyzePut(ASTnode* root,int curScope);
+errorInfo analyzeGet(ASTnode* root,int curScope);
+errorInfo analyzeIf(ASTnode* root,int curScope);
+errorInfo analyzeWhile(ASTnode* root,int curScope);
+
+
+
+
+
 
 //enum quadType{
 //	QASSIGNV,QASSIGNC,QADD,QMINUS,QGOTO,QIFEQUAL,QIFNOTEQUAL,QIFGT,QIFGTOREQUAL,QIFLESS,
@@ -28,6 +37,28 @@ errorInfo analyzeBool(ASTnode* root,int curScope);
 //	int op2;
 //	int ans;
 //};
+
+
+errorInfo checkVariable(ASTnode* v){
+	//check 一个变量是否存在未定义或是未赋值的错误
+	errorInfo e;
+	e.hasError = 0;
+	string name = v->tokenString;
+	if(!hasVariable(name)){
+		e.hasError = 1;
+		e.errorDetail = "变量"+name+"未定义";
+		e.errorIndex = v->tokenIndex;
+		return e;
+	}
+	if(hasNoValue(name)){
+		e.hasError = 1;
+		e.errorDetail = "变量"+name+"未赋值";
+		e.errorIndex = v->tokenIndex;
+		return e;
+	}
+	return e;
+	
+}
 
 errorInfo getNodeVal(ASTnode* root){
 	errorInfo e;
@@ -191,6 +222,79 @@ errorInfo analyzeBool(ASTnode* root,int curScope){
 	return e;
 }
 
+errorInfo analyzePut(ASTnode* root,int curScope){
+	//主要看变量是否定义以及是否有值 
+	errorInfo e;
+	e.hasError = 0;
+	for(auto x:root->sons){
+		if(!hasVariable(x->tokenString)){
+			e.hasError = 1;
+			e.errorDetail = "变量"+x->tokenString+"未定义"; 
+			e.errorIndex = x->tokenIndex;
+			return e;
+		}
+		if(hasNoValue(x->tokenString)){
+			e.hasError = 1;
+			e.errorDetail = "变量"+x->tokenString+"未赋值"; 
+			e.errorIndex = x->tokenIndex;
+			return e;
+		}
+	} 
+} 
+
+
+errorInfo analyzeGet(ASTnode* root,int curScope){
+	//主要看变量是否定义以及是否有值 
+	errorInfo e;
+	e.hasError = 0;
+	for(auto x:root->sons){
+		if(!hasVariable(x->tokenString)){
+			e.hasError = 1;
+			e.errorDetail = "变量"+x->tokenString+"未定义"; 
+			e.errorIndex = x->tokenIndex;
+			return e;
+		}
+	}
+}
+
+errorInfo analyzeIf(ASTnode* root,int curScope){
+	errorInfo e;
+	e.hasError = 0;
+	for(auto x : root->sons[0]->sons){
+		if(x->kind == VARIABLE)
+		{
+			errorInfo temp = checkVariable(x);
+			if(temp.hasError) return temp;
+		}
+		
+	}
+	errorInfo ifParts = analyzeProgram(root->sons[1],curScope+1);
+	if(ifParts.hasError) return ifParts;
+	if(root->sons.size() == 3){
+		errorInfo elseParts = analyzeProgram(root->sons[2],curScope+1);
+		if(elseParts.hasError) return elseParts;
+	}
+	return e;
+}
+
+
+errorInfo analyzeWhile(ASTnode* root,int curScope){
+	errorInfo e;
+	e.hasError = 0;
+	for(auto x : root->sons[0]->sons){
+		if(x->kind == VARIABLE)
+		{
+			errorInfo temp = checkVariable(x);
+			if(temp.hasError) return temp;
+		}
+		
+	}
+	errorInfo bodyParts = analyzeProgram(root->sons[1],curScope+1);
+	if(bodyParts.hasError) return bodyParts;
+	return e;
+}
+
+
 
 errorInfo analyzeProgram(ASTnode* root, int curScope){
 	errorInfo e;
@@ -200,12 +304,23 @@ errorInfo analyzeProgram(ASTnode* root, int curScope){
 			case ASSIGN:
 				e = analyzeAssign(son,curScope);
 				break;
-				//if(e.hasError = 1) return e;
 			case INT:
 				e = analyzeInt(son,curScope);
 				break;
 			case BOOL:
 				e = analyzeBool(son,curScope);
+				break;
+			case PUT:
+				e = analyzePut(son,curScope);
+				break;
+			case GET:
+				e = analyzeGet(son,curScope);
+				break;
+			case IF:
+				e = analyzeIf(son,curScope);
+				break;
+			case WHILE:
+				e = analyzeWhile(son,curScope);
 				break;
 			default:
 				cout<<"unexpected1"<<endl;

@@ -1,2 +1,5 @@
-int b =1;
-bool a = 1 + b;
+int a =1;
+while(a==1){
+
+  if( a == 2){ bool b = 2;};
+};

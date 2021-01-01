@@ -22,23 +22,6 @@ errorInfo analyzeIf(ASTnode* root,int curScope);
 errorInfo analyzeWhile(ASTnode* root,int curScope);
 
 
-
-
-
-
-//enum quadType{
-//	QASSIGNV,QASSIGNC,QADD,QMINUS,QGOTO,QIFEQUAL,QIFNOTEQUAL,QIFGT,QIFGTOREQUAL,QIFLESS,
-//	QIFLESSOREQUAL,QFUNC
-//};
-//
-//struct Quad{
-//	int type;
-//	int op1;
-//	int op2;
-//	int ans;
-//};
-
-
 errorInfo checkVariable(ASTnode* v){
 	//check 一个变量是否存在未定义或是未赋值的错误
 	errorInfo e;

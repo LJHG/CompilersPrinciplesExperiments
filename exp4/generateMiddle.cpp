@@ -154,7 +154,7 @@ vector<Quad*> processInt_quad(ASTnode* root){
 		//说明是定义赋值性语句
 		rightPart = processExp_quad(root->sons[1]);
 		//把rightpart里面的最后一个的临时变量赋给变量
-		int len = rightPart.size(); //好像只会是1 
+		int len = rightPart.size();
 		string tempv = rightPart[len-1]->ans;
 		for(auto v:root->sons[0]->sons){
 			rightPart.push_back(new Quad(LABEL,"_","_",v->tokenString));

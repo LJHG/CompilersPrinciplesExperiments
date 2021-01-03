@@ -50,5 +50,8 @@ int main()
 	cout<<"**************下面生成中间代码******************"<<endl;
 	vector<Quad*> qans = generateMiddle(ASTroot);
 	showQuadList(qans);
+	cout<<"**************下面生成目标代码******************"<<endl;
+	vector<string> res = generateTarget(qans);
+	showTargetList(res);
 	return 0;
 }

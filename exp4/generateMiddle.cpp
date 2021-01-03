@@ -113,28 +113,28 @@ vector<Quad*> processExp_quad(ASTnode* root){
 			res.push_back(label);
 			res.push_back(item);
 			break;
-		case QBITAND:
+		case BITAND:
 			label = new Quad(LABEL,"_","_","t"+to_string(tempVarCnt));
 			item = new Quad(QBITAND,root->sons[0]->tokenString,root->sons[1]->tokenString,"t"+to_string(tempVarCnt));
 			tempVarCnt++;
 			res.push_back(label);
 			res.push_back(item);
 			break;
-		case QBITOR:
+		case BITOR:
 			label = new Quad(LABEL,"_","_","t"+to_string(tempVarCnt));
 			item = new Quad(QBITOR,root->sons[0]->tokenString,root->sons[1]->tokenString,"t"+to_string(tempVarCnt));
 			tempVarCnt++;
 			res.push_back(label);
 			res.push_back(item);
 			break;
-		case QAND:
+		case AND:
 			label = new Quad(LABEL,"_","_","t"+to_string(tempVarCnt));
 			item = new Quad(QAND,root->sons[0]->tokenString,root->sons[1]->tokenString,"t"+to_string(tempVarCnt));
 			tempVarCnt++;
 			res.push_back(label);
 			res.push_back(item);
 			break;
-		case QOR:
+		case OR:
 			label = new Quad(LABEL,"_","_","t"+to_string(tempVarCnt));
 			item = new Quad(QOR,root->sons[0]->tokenString,root->sons[1]->tokenString,"t"+to_string(tempVarCnt));
 			tempVarCnt++;
@@ -298,16 +298,13 @@ vector<Quad*> generateMiddle(ASTnode* root){
 	
 	processProgram_quad(root,goto_indexs,tobe_process,res);
 	
-	
-	cout<<goto_indexs.size()<<" "<<tobe_process.size()<<endl;
-	
 	res.push_back(new Quad(QEND,"","",""));
 	
 	//所有全部弄完了之后，开始弄
 	while(!tobe_process.empty()){
 		ASTnode* r = tobe_process.front();
 		tobe_process.pop();
-		if(goto_indexs.size() == 0) cout<<"unexpected2222222222222"<<endl;
+		if(goto_indexs.size() == 0) cout<<"unexpected"<<endl;
 		goto_pair pp = goto_indexs.front();
 		goto_indexs.pop();
 		
@@ -330,5 +327,93 @@ vector<Quad*> generateMiddle(ASTnode* root){
 	}
 	return res;
 	
+}
+
+
+string regWrapper(string s){
+	return "reg("+s+")";
+}
+
+//generateTraget
+vector<string> generateTarget(vector<Quad*> quads)
+{
+	vector<string> res;
+	int len = quads.size();
+	string s= "";
+	for(int i=0;i<len;i++){
+		s = "";
+		switch(quads[i]->type){
+			case LABEL:
+				s = quads[i]->ans;
+				break;
+			case QASSIGNV:
+				s = "move "+regWrapper(quads[i]->ans)+","+regWrapper(quads[i]->op1);
+				break;
+			case QASSIGNC:
+				s = "li "+regWrapper(quads[i]->ans)+","+quads[i]->op1;
+				break;
+			case QADD:
+			case QSUB:
+			case QBITAND:
+			case QBITOR:
+				s = string_quad[quads[i]->type]+" "+regWrapper(quads[i]->ans)+",";
+				if(isNumber(quads[i]->op1))
+					s += quads[i]->op1;
+				else
+					s += regWrapper(quads[i]->op1);
+				s += ",";
+				if(isNumber(quads[i]->op2))
+					s += quads[i]->op2;
+				else
+					s += regWrapper(quads[i]->op2);
+				break;
+			case QGOTO:
+				s = "j "+quads[i]->ans;
+				break;
+			case QEND:
+				s = "end";
+				break;
+			case QIFEQUAL:
+			case QIFNOTEQUAL:
+			case QIFGT:
+			case QIFGTOREQUAL:
+			case QIFLESS:
+			case QIFLESSOREQUAL:
+				s =  string_quad[quads[i]->type]+" ";
+				if(isNumber(quads[i]->op1))
+					s += quads[i]->op1;
+				else
+					s += regWrapper(quads[i]->op1);
+				s += ",";
+				if(isNumber(quads[i]->op2))
+					s += quads[i]->op2;
+				else
+					s += regWrapper(quads[i]->op2);
+				s += ",";
+				s += quads[i]->ans;
+				break;
+			case QPUT:
+			case QGET:
+				s = string_quad[quads[i]->type];
+				break;
+			default:
+				cout<<"unexpected"<<endl;
+		}
+		res.push_back(s);
+	}
+	return res;
 } 
+
+void showTargetList(vector<string> list){
+	int len = list.size();
+	for(int i=0;i<len;i++){
+		string x = list[i];
+		cout<<" 位置:"<<i<<"   "<<list[i]<<endl;
+	}		
+}
+
+
+
+
+
 
